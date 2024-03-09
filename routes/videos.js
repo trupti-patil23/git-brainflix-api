@@ -51,19 +51,22 @@ router.get("/:videoId", (req, res) => {
  * Write updated data back to file
  */
 router.post("/:videoId/comments", (req, res) => {
-    try {
+    try {         
         const newCommentData = {
-            id: uuidv4(),
-            name: req.body.name,
-            comment: req.body.comment
+            id: uuidv4(), 
+            ...req.body         
         };
+        console.log("new comment data",newCommentData);
         const { videoId } = req.params;
         const videosData = readVideosData();
         const video = Array.isArray(videosData) && videosData.find((video) => (video.id === videoId));
         if (!video) {
             return res.status(404).json({ error: 'Video not found' });
         }
-        video.comments.push(newCommentData);
+
+        //Added new commment object to existing comments array at the top
+        video.comments=[newCommentData, ...video.comments];
+        
         fs.writeFileSync(JSON_FILE_NAME, JSON.stringify(videosData, null, 2));
         res.status(201).json({ message: `New comment object added successfully for video id ${videoId}` });
     } catch (error) {

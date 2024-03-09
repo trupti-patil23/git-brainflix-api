@@ -1,7 +1,7 @@
 //Load required modules
 const express = require("express");
 require("dotenv").config(); 
-//const cors = require("cors");
+const cors = require("cors");
 const videoRoutes = require("./routes/videos");
 
 const app = express();
@@ -9,7 +9,7 @@ const app = express();
 //Using express.json() middleware to accept JSON payloads in POST requests
 app.use(express.json());
 
-//app.use(cors()); 
+app.use(cors()); 
 
 //Set the routes
 app.use("/videos", videoRoutes);
