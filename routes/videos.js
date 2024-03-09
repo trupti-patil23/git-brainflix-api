@@ -32,8 +32,8 @@ router.get("/", (req, res) => {
    and then finding video data for given id,  parse json data into a javascript object
  */
 router.get("/:videoId", (req, res) => {
-    try {
-        const { videoId } = req.params;
+    const { videoId } = req.params;
+    try {       
         const videosData = readVideosData();
         res.status(200).json(videosData.find((video) => (video.id === videoId)));
     } catch (error) {
@@ -51,13 +51,12 @@ router.get("/:videoId", (req, res) => {
  * Write updated data back to file
  */
 router.post("/:videoId/comments", (req, res) => {
+    const { videoId } = req.params;
     try {         
         const newCommentData = {
             id: uuidv4(), 
             ...req.body         
-        };
-        console.log("new comment data",newCommentData);
-        const { videoId } = req.params;
+        };            
         const videosData = readVideosData();
         const video = Array.isArray(videosData) && videosData.find((video) => (video.id === videoId));
         if (!video) {
@@ -79,8 +78,8 @@ router.post("/:videoId/comments", (req, res) => {
  * DELETE /videos/:videoId/comments/:commentId => Delete requested CommentId for given videoId.
  */
 router.delete("/:videoId/comments/:commentId", (req, res) => {
-    try {
-        const { videoId, commentId } = req.params;
+    const { videoId, commentId } = req.params;
+    try {        
         const videosData = readVideosData();
         const video = Array.isArray(videosData) && videosData.find((video) => (video.id === videoId));
         if (!video) {
@@ -107,8 +106,8 @@ router.delete("/:videoId/comments/:commentId", (req, res) => {
  * Put /videos/:videoId/likes :Update likes property of video for requested video Id
  */
 router.put("/:videoId/likes", (req, res) => {
-    try {
-        const { videoId } = req.params;
+    const { videoId } = req.params;
+    try {       
         const videosData = readVideosData();
         const video = Array.isArray(videosData) && videosData.find((video) => (video.id === videoId));
         if (!video) {
@@ -116,7 +115,9 @@ router.put("/:videoId/likes", (req, res) => {
         }
         let likesInt = parseInt((video.likes).replace(/,/, ''));
         likesInt = likesInt + 1;
-        video.likes = likesInt.toString();
+        let stringLikes = likesInt.toString();    
+        let commaIndex= stringLikes.length===4 ? 1 :parseInt(stringLikes.length/2);        
+        video.likes = stringLikes.slice(0,commaIndex)+","+stringLikes.slice(commaIndex);
         fs.writeFileSync(JSON_FILE_NAME, JSON.stringify(videosData, null, 2));
         res.status(200).json({ message: `likes propery updated successfully for video id ${videoId}` });
     } catch (error) {
