@@ -33,7 +33,7 @@ router.get("/", (req, res) => {
  */
 router.get("/:videoId", (req, res) => {
     const { videoId } = req.params;
-    try {       
+    try {
         const videosData = readVideosData();
         res.status(200).json(videosData.find((video) => (video.id === videoId)));
     } catch (error) {
@@ -47,17 +47,17 @@ router.get("/:videoId", (req, res) => {
  * Create unique id for each new video
  * Add new video entry to video-details.json file  
  */
-router.post("/",(req,res) => {        
-    try{
+router.post("/", (req, res) => {
+    try {
         const newVideo = {
-            id: uuidv4(), 
+            id: uuidv4(),
             ...req.body
         }
         let videosData = readVideosData();
         videosData = [...videosData, newVideo]; //Add a new video
         fs.writeFileSync(JSON_FILE_NAME, JSON.stringify(videosData, null, 2));
         res.status(201).json({ message: `New video object added successfully` });
-    } catch(error) {
+    } catch (error) {
         console.error(`Error in posting new video object`, error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
@@ -73,11 +73,11 @@ router.post("/",(req,res) => {
  */
 router.post("/:videoId/comments", (req, res) => {
     const { videoId } = req.params;
-    try {         
+    try {
         const newCommentData = {
-            id: uuidv4(), 
-            ...req.body         
-        };            
+            id: uuidv4(),
+            ...req.body
+        };
         const videosData = readVideosData();
         const video = Array.isArray(videosData) && videosData.find((video) => (video.id === videoId));
         if (!video) {
@@ -85,8 +85,8 @@ router.post("/:videoId/comments", (req, res) => {
         }
 
         //Added new commment object to existing comments array at the top
-        video.comments=[newCommentData, ...video.comments];
-        
+        video.comments = [newCommentData, ...video.comments];
+
         fs.writeFileSync(JSON_FILE_NAME, JSON.stringify(videosData, null, 2));
         res.status(201).json({ message: `New comment object added successfully for video id ${videoId}` });
     } catch (error) {
@@ -100,7 +100,7 @@ router.post("/:videoId/comments", (req, res) => {
  */
 router.delete("/:videoId/comments/:commentId", (req, res) => {
     const { videoId, commentId } = req.params;
-    try {        
+    try {
         const videosData = readVideosData();
         const video = Array.isArray(videosData) && videosData.find((video) => (video.id === videoId));
         if (!video) {
@@ -128,7 +128,7 @@ router.delete("/:videoId/comments/:commentId", (req, res) => {
  */
 router.put("/:videoId/likes", (req, res) => {
     const { videoId } = req.params;
-    try {       
+    try {
         const videosData = readVideosData();
         const video = Array.isArray(videosData) && videosData.find((video) => (video.id === videoId));
         if (!video) {
@@ -136,8 +136,8 @@ router.put("/:videoId/likes", (req, res) => {
         }
         let likesInt = parseInt((video.likes).replace(/,/, ''));
         likesInt = likesInt + 1;
-        let stringLikes = likesInt.toString(); 
-        video.likes= stringLikes.replace(/\B(?=(\d{3})+(?!\d))/g, ",");        
+        let stringLikes = likesInt.toString();
+        video.likes = stringLikes.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         fs.writeFileSync(JSON_FILE_NAME, JSON.stringify(videosData, null, 2));
         res.status(200).json({ message: `likes propery updated successfully for video id ${videoId}` });
     } catch (error) {
