@@ -47,8 +47,7 @@ router.get("/:videoId", (req, res) => {
  * Create unique id for each new video
  * Add new video entry to video-details.json file  
  */
-router.post("/",(req,res) => {  
-    console.log("Posting new video");    
+router.post("/",(req,res) => {        
     try{
         const newVideo = {
             id: uuidv4(), 
@@ -58,7 +57,6 @@ router.post("/",(req,res) => {
         videosData = [...videosData, newVideo]; //Add a new video
         fs.writeFileSync(JSON_FILE_NAME, JSON.stringify(videosData, null, 2));
         res.status(201).json({ message: `New video object added successfully` });
-
     } catch(error) {
         console.error(`Error in posting new video object`, error);
         res.status(500).json({ error: 'Internal Server Error' });
