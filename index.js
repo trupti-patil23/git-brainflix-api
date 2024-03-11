@@ -9,6 +9,9 @@ const app = express();
 //Using express.json() middleware to accept JSON payloads in POST requests
 app.use(express.json());
 
+//Using below middleware to allow users to access static files(images)
+app.use(express.static("public"));
+
 app.use(cors()); 
 
 //Set the routes

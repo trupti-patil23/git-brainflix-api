@@ -43,6 +43,29 @@ router.get("/:videoId", (req, res) => {
 });
 
 /**
+ * POST request: /videos =>save a new video,
+ * Create unique id for each new video
+ * Add new video entry to video-details.json file  
+ */
+router.post("/",(req,res) => {  
+    console.log("Posting new video");    
+    try{
+        const newVideo = {
+            id: uuidv4(), 
+            ...req.body
+        }
+        let videosData = readVideosData();
+        videosData = [...videosData, newVideo]; //Add a new video
+        fs.writeFileSync(JSON_FILE_NAME, JSON.stringify(videosData, null, 2));
+        res.status(201).json({ message: `New video object added successfully` });
+
+    } catch(error) {
+        console.error(`Error in posting new video object`, error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+/**
  * POST /videos/:id/comments => Post the new Comment for given video id,
  * Get new comment Object from request body, 
  * get all videos data by reading from video-details.json,
@@ -115,9 +138,8 @@ router.put("/:videoId/likes", (req, res) => {
         }
         let likesInt = parseInt((video.likes).replace(/,/, ''));
         likesInt = likesInt + 1;
-        let stringLikes = likesInt.toString();    
-        let commaIndex= stringLikes.length===4 ? 1 :parseInt(stringLikes.length/2);        
-        video.likes = stringLikes.slice(0,commaIndex)+","+stringLikes.slice(commaIndex);
+        let stringLikes = likesInt.toString(); 
+        video.likes= stringLikes.replace(/\B(?=(\d{3})+(?!\d))/g, ",");        
         fs.writeFileSync(JSON_FILE_NAME, JSON.stringify(videosData, null, 2));
         res.status(200).json({ message: `likes propery updated successfully for video id ${videoId}` });
     } catch (error) {
